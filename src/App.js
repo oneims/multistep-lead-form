@@ -15,8 +15,9 @@ const App = () => {
   const [expanded, setExpanded] = useState(false);
   const [slide, setSlide] = useState([
     {
-      id: 1,
+      id: 0,
       heading: `Hi 👋 What's your name?`,
+      type: "form",
       formFields: [
         {
           name: `fName`,
@@ -33,8 +34,9 @@ const App = () => {
       ],
     },
     {
-      id: 2,
+      id: 1,
       heading: `Hi {name}, what's your email address?`,
+      type: "form",
       formFields: [
         {
           name: `email`,
@@ -45,8 +47,9 @@ const App = () => {
       ],
     },
     {
-      id: 3,
+      id: 2,
       heading: `And your phone number?`,
+      type: "form",
       formFields: [
         {
           name: `phone`,
@@ -57,6 +60,21 @@ const App = () => {
       ],
     },
   ]);
+  const [currentlyActive, setCurrentlyActive] = useState(0);
+  const [pagination, setPagination] = useState({
+    canNext: true,
+    canPrev: false,
+  });
+
+  const handleNext = () => {
+    setCurrentlyActive(
+      currentlyActive === slide.length - 1 ? slide.length - 1 : currentlyActive + 1
+    );
+  };
+
+  const handlePrev = () => {
+    setCurrentlyActive(currentlyActive !== 0 ? currentlyActive - 1 : 0);
+  };
 
   const cardRef = useRef();
 
@@ -69,6 +87,23 @@ const App = () => {
       height: cardRef.current.getBoundingClientRect().height,
     }));
   };
+
+  useEffect(() => {
+    setPagination({
+      canNext: currentlyActive !== slide.length - 1,
+      canPrev: currentlyActive !== 0,
+    });
+  }, [currentlyActive]);
+
+  useEffect(() => {
+    setBoundingClientRect((prevState) => ({
+      ...prevState,
+      left: cardRef.current.getBoundingClientRect().left,
+      top: cardRef.current.getBoundingClientRect().top,
+      width: cardRef.current.getBoundingClientRect().width,
+      height: cardRef.current.getBoundingClientRect().height,
+    }));
+  }, []);
 
   useEffect(() => {
     window.addEventListener("scroll", scrollHandler, true);
@@ -185,9 +220,25 @@ const App = () => {
                             </div>
                           </button>
                           <form className="MODULE__MultiStepFormCTA__card__form">
-                            <FormSlide />
+                            {slide.map((elem, index) => {
+                              return (
+                                <FormSlide
+                                  key={elem.id}
+                                  index={index}
+                                  currentlyActive={currentlyActive}
+                                  active={currentlyActive === elem.id}
+                                  heading={elem.heading}
+                                  formFields={elem.formFields}
+                                />
+                              );
+                            })}
                           </form>
-                          <Navigation />
+                          <Navigation
+                            handleNext={handleNext}
+                            handlePrev={handlePrev}
+                            canNext={pagination.canNext}
+                            canPrev={pagination.canPrev}
+                          />
                         </div>
                         <div className="MODULE__heading"></div>
                       </div>

@@ -1,9 +1,16 @@
 import React from "react";
 
-const FormSlide = ({ heading, formFields }) => {
+const FormSlide = ({ heading, formFields, active, currentlyActive, index, type }) => {
   return (
     <>
-      <div className="MODULE__MultiStepFormCTA__card__slide">
+      <div
+        style={{
+          marginLeft: index === 0 ? `-${Number(currentlyActive)}00%` : `0%`,
+        }}
+        className={`MODULE__MultiStepFormCTA__card__slide ${
+          active ? `MODULE__MultiStepFormCTA__card__slide-active` : ``
+        }`}
+      >
         <div className="MODULE__MultiStepFormCTA__card__slide__wrapper">
           {heading && (
             <div className="MODULE__MultiStepFormCTA__card__slide__heading">

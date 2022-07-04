@@ -2,6 +2,25 @@ import { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
 .MODULE {
+  &__pill {
+    padding: 0.2rem 0.5rem;
+    color: #fff;
+    background-color: #00bda5;
+    border-radius: 10px 3px 3px 10px;
+    line-height: 1;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: none;
+    &-wrapper {
+      margin-bottom: 1rem;
+    }
+  }
+  &__inline-callout-cta {
+    .MODULE__heading-and-subtitle {
+      margin-bottom: 1.75rem;
+    }
+  }
   &__MultiStepFormCTA {
     position: relative;
     height: 15rem;
@@ -98,7 +117,6 @@ const GlobalStyle = createGlobalStyle`
         border-radius: 3px;
         overflow: hidden;
         margin-right: 2rem;
-        opacity: 0.3;
         svg {
           width: 100%;
           height: 100%;
@@ -107,6 +125,14 @@ const GlobalStyle = createGlobalStyle`
           svg {
             transform: rotate(180deg);
           }
+        }
+        &-next {
+          margin-right: 0;
+          margin-left: 2rem;
+        }
+        &-disabled {
+          opacity: 0.3;
+          pointer-events: none;
         }
       }
       &__svg-wrapper {
@@ -148,9 +174,7 @@ const GlobalStyle = createGlobalStyle`
         width: 100%;
         min-width: 100%;
         display: flex;
-        -webkit-box-align: center;
         align-items: center;
-        -webkit-box-pack: center;
         justify-content: center;
         color: rgb(255, 255, 255);
         overflow: hidden;
