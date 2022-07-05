@@ -101,6 +101,7 @@ const GlobalStyle = createGlobalStyle`
       transition: transform 0.3s linear 0s, max-height 0.3s linear 0s;
       overflow: hidden;
       &__icon-wrapper {
+        position: relative;
         width: 2.5rem;
         height: 2.5rem;
         display: flex;
@@ -128,6 +129,15 @@ const GlobalStyle = createGlobalStyle`
         &-next {
           margin-right: 0;
           margin-left: 2rem;
+        }
+        &-submit {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          width: 100%;
+          height: 100%;
         }
         &-disabled {
           opacity: 0.3;
@@ -158,7 +168,6 @@ const GlobalStyle = createGlobalStyle`
         display: flex;
         flex-direction: column;
         justify-content: center;
-        padding: 3rem 0;
       }
       &__form {
         height: 100%;
@@ -219,6 +228,7 @@ const GlobalStyle = createGlobalStyle`
           flex-direction: column;
           width: 100%;
           max-width: 220px;
+          position: relative;
           &:first-child {
             margin-right: 1rem;
           }
@@ -276,6 +286,8 @@ const GlobalStyle = createGlobalStyle`
             font-size: 0.75rem;
             font-weight: 400;
             line-height: 1.5;
+            position: absolute;
+            bottom: -1.5rem;
           }
         }
       }
@@ -293,16 +305,17 @@ const GlobalStyle = createGlobalStyle`
             z-index: -1;
           }
           &__card {
-            // width: 100vw;
-            // height: 100vh;
-            // top: 0;
-            // left: 0;
-            // transition: 0.2s ease;
+            &__wrapper {
+              padding: 3rem 0;
+            }
             position: fixed;
             z-index: 99999;
             cursor: default;
             &__slide {
               &__form-field {
+                &__error {
+                  visibility: visible;
+                }
                 &__input {
                   pointer-events: all;
                 }

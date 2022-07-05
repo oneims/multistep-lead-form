@@ -11,14 +11,15 @@ import { useForm } from "react-hook-form";
 const App = () => {
   // Ref
   const cardRef = useRef();
-
   // Hooks
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    mode: "all",
+  });
   const [playState, setPlayState] = useState(PlayState.stop);
   const [boundingClientRect, setBoundingClientRect] = useState({
     top: 0,
@@ -36,30 +37,39 @@ const App = () => {
         {
           tabIndex: 1,
           name: `fName`,
+          required: {
+            value: true,
+            message: `Must consist of at least one character`,
+          },
           label: `First Name`,
           placeholder: `John`,
-          errorMessage: `Must consist of at least one character`,
         },
         {
           tabIndex: 2,
           name: `lName`,
+          required: {
+            value: true,
+            message: `Must consist of at least one character`,
+          },
           label: `Last Name`,
           placeholder: `Smith`,
-          errorMessage: `Must consist of at least one character`,
         },
       ],
     },
     {
       id: 1,
-      heading: `Hi {name}, what's your email address?`,
+      heading: `Hi ${watch("fName")}, what's your email address?`,
       type: "form",
       formFields: [
         {
           tabIndex: -1,
           name: `email`,
+          required: {
+            value: true,
+            message: `Must enter a valid email`,
+          },
           label: `Email Address`,
           placeholder: `john@smith.com`,
-          errorMessage: `Must enter a valid email`,
         },
       ],
     },
@@ -71,22 +81,33 @@ const App = () => {
         {
           tabIndex: -1,
           name: `phone`,
+          required: {
+            value: true,
+            message: `Number may only contain numbers, +()-. and x`,
+          },
           label: `Phone Number`,
           placeholder: `111 222 3333`,
-          errorMessage: `Number may only contain numbers, +()-. and x`,
         },
       ],
+    },
+    {
+      id: 3,
+      type: "message",
+      heading: `Awesome`,
+      description: ``,
+      buttonTitle: ``,
+      buttonDestination: ``,
     },
   ]);
   const [currentlyActive, setCurrentlyActive] = useState(0);
   const [pagination, setPagination] = useState({
-    canNext: true,
+    canNext: false,
     canPrev: false,
   });
   const [progress, setProgress] = useState(0);
 
   // Handlers
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = (data) => console.log(`form submitted: `, data);
 
   console.log(watch("fName"));
 
@@ -101,7 +122,7 @@ const App = () => {
   };
 
   const handleProgress = () => {
-    setProgress((currentlyActive / slide.length) * 100);
+    setProgress((currentlyActive / (slide.length - 1)) * 100);
   };
 
   const scrollHandler = () => {
@@ -128,11 +149,30 @@ const App = () => {
     }
   };
 
-  useEffect(() => {
-    setPagination({
-      canNext: currentlyActive !== slide.length - 1,
-      canPrev: currentlyActive !== 0,
+  const HandleSlideValidated = () => {
+    const activeFormFields = slide[currentlyActive]?.formFields;
+    if (!activeFormFields) return null;
+    activeFormFields.forEach((elem) => {
+      if (errors[elem.name] || watch(elem.name).length < 1) {
+        setPagination((prevState) => ({
+          ...prevState,
+          canNext: false,
+        }));
+      } else {
+        setPagination((prevState) => ({
+          ...prevState,
+          canNext: true,
+        }));
+      }
     });
+  };
+
+  useEffect(() => {
+    setPagination((prevState) => ({
+      ...prevState,
+      canPrev: currentlyActive !== 0,
+    }));
+    HandleSlideValidated();
     handleProgress();
   }, [currentlyActive]);
 
@@ -253,11 +293,14 @@ const App = () => {
                                 <FormSlide
                                   key={elem.id}
                                   index={index}
+                                  type={elem.type}
                                   currentlyActive={currentlyActive}
                                   active={currentlyActive === elem.id}
                                   heading={elem.heading}
                                   formFields={elem.formFields}
                                   register={register}
+                                  errors={errors}
+                                  HandleSlideValidated={HandleSlideValidated}
                                 />
                               );
                             })}
@@ -268,6 +311,10 @@ const App = () => {
                             canNext={pagination.canNext}
                             canPrev={pagination.canPrev}
                             progress={progress}
+                            currentlyActive={currentlyActive}
+                            slidesLength={slide.length}
+                            handleSubmit={handleSubmit}
+                            onSubmit={onSubmit}
                           />
                         </div>
                         <div className="MODULE__heading"></div>

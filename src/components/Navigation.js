@@ -1,7 +1,17 @@
 import React from "react";
 import CircularProgress from "./CircularProgress";
 
-const Navigation = ({ handleNext, handlePrev, canNext, canPrev, progress }) => {
+const Navigation = ({
+  handleNext,
+  handlePrev,
+  canNext,
+  canPrev,
+  progress,
+  slidesLength,
+  currentlyActive,
+  handleSubmit,
+  onSubmit,
+}) => {
   return (
     <>
       <div className="MODULE__MultiStepFormCTA__navigation">
@@ -28,11 +38,21 @@ const Navigation = ({ handleNext, handlePrev, canNext, canPrev, progress }) => {
         </span>
         <CircularProgress value={progress} />
         <span
-          onClick={() => handleNext()}
+          onClick={() => {
+            handleNext();
+          }}
+          // onClick={handleSubmit((d) => console.log(d))}
           className={`MODULE__MultiStepFormCTA__navigation__icon-wrapper MODULE__MultiStepFormCTA__navigation__icon-wrapper-next ${
             canNext ? `` : `MODULE__MultiStepFormCTA__navigation__icon-wrapper-disabled`
           }`}
         >
+          {slidesLength - 2 === currentlyActive && (
+            <span
+              className="MODULE__MultiStepFormCTA__navigation__icon-wrapper-submit"
+              onClick={handleSubmit(onSubmit)}
+            ></span>
+          )}
+          {/* <span>{`${currentlyActive} -- ${slidesLength - 1}`}</span> */}
           <div className="MODULE__MultiStepFormCTA__navigation__svg-wrapper">
             <span>
               <svg
