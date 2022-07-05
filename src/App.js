@@ -1,10 +1,24 @@
 import React, { useEffect, useState, useRef } from "react";
+// Animations
 import { PlayState, Tween } from "react-gsap";
+// Components
 import Header from "./components/Header";
 import FormSlide from "./components/FormSlide";
 import Navigation from "./components/Navigation";
+// Form
+import { useForm } from "react-hook-form";
 
 const App = () => {
+  // Ref
+  const cardRef = useRef();
+
+  // Hooks
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
   const [playState, setPlayState] = useState(PlayState.stop);
   const [boundingClientRect, setBoundingClientRect] = useState({
     top: 0,
@@ -20,12 +34,14 @@ const App = () => {
       type: "form",
       formFields: [
         {
+          tabIndex: 1,
           name: `fName`,
           label: `First Name`,
           placeholder: `John`,
           errorMessage: `Must consist of at least one character`,
         },
         {
+          tabIndex: 2,
           name: `lName`,
           label: `Last Name`,
           placeholder: `Smith`,
@@ -39,6 +55,7 @@ const App = () => {
       type: "form",
       formFields: [
         {
+          tabIndex: -1,
           name: `email`,
           label: `Email Address`,
           placeholder: `john@smith.com`,
@@ -52,6 +69,7 @@ const App = () => {
       type: "form",
       formFields: [
         {
+          tabIndex: -1,
           name: `phone`,
           label: `Phone Number`,
           placeholder: `111 222 3333`,
@@ -65,6 +83,12 @@ const App = () => {
     canNext: true,
     canPrev: false,
   });
+  const [progress, setProgress] = useState(0);
+
+  // Handlers
+  const onSubmit = (data) => console.log(data);
+
+  console.log(watch("fName"));
 
   const handleNext = () => {
     setCurrentlyActive(
@@ -76,7 +100,9 @@ const App = () => {
     setCurrentlyActive(currentlyActive !== 0 ? currentlyActive - 1 : 0);
   };
 
-  const cardRef = useRef();
+  const handleProgress = () => {
+    setProgress((currentlyActive / slide.length) * 100);
+  };
 
   const scrollHandler = () => {
     setBoundingClientRect((prevState) => ({
@@ -88,11 +114,26 @@ const App = () => {
     }));
   };
 
+  const HandleExpanded = () => {
+    if (expanded) {
+      setExpanded(false);
+      setPlayState(PlayState.reverse);
+      setTimeout(() => {
+        document.body.style.overflow = "";
+      }, 1000);
+    } else {
+      setExpanded(true);
+      setPlayState(PlayState.play);
+      document.body.style.overflow = "hidden";
+    }
+  };
+
   useEffect(() => {
     setPagination({
       canNext: currentlyActive !== slide.length - 1,
       canPrev: currentlyActive !== 0,
     });
+    handleProgress();
   }, [currentlyActive]);
 
   useEffect(() => {
@@ -111,20 +152,6 @@ const App = () => {
       window.removeEventListener("scroll", scrollHandler, true);
     };
   }, [boundingClientRect]);
-
-  const HandleExpanded = () => {
-    if (expanded) {
-      setExpanded(false);
-      setPlayState(PlayState.reverse);
-      setTimeout(() => {
-        document.body.style.overflow = "";
-      }, 1000);
-    } else {
-      setExpanded(true);
-      setPlayState(PlayState.play);
-      document.body.style.overflow = "hidden";
-    }
-  };
 
   return (
     <>
@@ -167,8 +194,9 @@ const App = () => {
                         top: "7.5vh",
                         left: "7.5vw",
                       }}
-                      duration={1}
-                      ease="elastic.out(0.2, 0.1)"
+                      // stagger={0.1}
+                      duration={0.75}
+                      ease="elastic.out(0.1, 0.1)"
                     >
                       <div
                         style={{
@@ -229,6 +257,7 @@ const App = () => {
                                   active={currentlyActive === elem.id}
                                   heading={elem.heading}
                                   formFields={elem.formFields}
+                                  register={register}
                                 />
                               );
                             })}
@@ -238,6 +267,7 @@ const App = () => {
                             handlePrev={handlePrev}
                             canNext={pagination.canNext}
                             canPrev={pagination.canPrev}
+                            progress={progress}
                           />
                         </div>
                         <div className="MODULE__heading"></div>

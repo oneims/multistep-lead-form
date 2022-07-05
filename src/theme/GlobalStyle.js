@@ -95,9 +95,7 @@ const GlobalStyle = createGlobalStyle`
       max-height: 0%;
       margin: 0px auto;
       display: flex;
-      -webkit-box-pack: center;
       justify-content: center;
-      -webkit-box-align: center;
       align-items: center;
       transform: scale(0);
       transition: transform 0.3s linear 0s, max-height 0.3s linear 0s;
@@ -106,9 +104,7 @@ const GlobalStyle = createGlobalStyle`
         width: 2.5rem;
         height: 2.5rem;
         display: flex;
-        -webkit-box-pack: center;
         justify-content: center;
-        -webkit-box-align: center;
         align-items: center;
         cursor: pointer;
         transition: opacity 0.3s linear 0s;
@@ -117,6 +113,9 @@ const GlobalStyle = createGlobalStyle`
         border-radius: 3px;
         overflow: hidden;
         margin-right: 2rem;
+        &:hover {
+          background-color: #eee;
+        }
         svg {
           width: 100%;
           height: 100%;
@@ -158,8 +157,8 @@ const GlobalStyle = createGlobalStyle`
         width: 100%;
         display: flex;
         flex-direction: column;
-        -webkit-box-pack: center;
         justify-content: center;
+        padding: 3rem 0;
       }
       &__form {
         height: 100%;
@@ -246,6 +245,9 @@ const GlobalStyle = createGlobalStyle`
             text-align: center;
             overflow: hidden;
             font-size: 1rem;
+            &:focus {
+              outline: none;
+            }
             &-svg-wrapper {
               position: absolute;
               right: 0.5rem;
@@ -299,6 +301,13 @@ const GlobalStyle = createGlobalStyle`
             position: fixed;
             z-index: 99999;
             cursor: default;
+            &__slide {
+              &__form-field {
+                &__input {
+                  pointer-events: all;
+                }
+              }
+            }
           }
           &__image-cutout {
             opacity: 0;

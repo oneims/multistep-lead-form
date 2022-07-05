@@ -1,6 +1,7 @@
 import React from "react";
+import CircularProgress from "./CircularProgress";
 
-const Navigation = ({ handleNext, handlePrev, canNext, canPrev }) => {
+const Navigation = ({ handleNext, handlePrev, canNext, canPrev, progress }) => {
   return (
     <>
       <div className="MODULE__MultiStepFormCTA__navigation">
@@ -25,6 +26,7 @@ const Navigation = ({ handleNext, handlePrev, canNext, canPrev }) => {
             </span>
           </div>
         </span>
+        <CircularProgress value={progress} />
         <span
           onClick={() => handleNext()}
           className={`MODULE__MultiStepFormCTA__navigation__icon-wrapper MODULE__MultiStepFormCTA__navigation__icon-wrapper-next ${

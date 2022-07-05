@@ -1,6 +1,6 @@
 import React from "react";
 
-const FormSlide = ({ heading, formFields, active, currentlyActive, index, type }) => {
+const FormSlide = ({ heading, formFields, active, currentlyActive, index, type, register }) => {
   return (
     <>
       <div
@@ -29,11 +29,13 @@ const FormSlide = ({ heading, formFields, active, currentlyActive, index, type }
                   </label>
                   <div className="MODULE__MultiStepFormCTA__card__slide__form-field__input-wrapper">
                     <input
+                      tabindex={elem.tabIndex}
                       type="text"
                       id={elem.name}
                       name={elem.name}
                       placeholder={elem.placeholder}
                       className="MODULE__MultiStepFormCTA__card__slide__form-field__input"
+                      {...register(elem.name, { required: elem.required })}
                     />
                     <div className="MODULE__MultiStepFormCTA__card__slide__form-field__input-svg-wrapper">
                       <div className="MODULE__MultiStepFormCTA__card__slide__form-field__input-svg">
