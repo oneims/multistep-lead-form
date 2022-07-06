@@ -161,6 +161,10 @@ const GlobalStyle = createGlobalStyle`
       // position: relative;
       position: sticky;
       z-index: 1;
+      // &-not-expanded {
+      //   width: 100% !important;
+      //   height: 100% !important;
+      // }
       &__wrapper {
         position: relative;
         height: 100%;
@@ -192,6 +196,19 @@ const GlobalStyle = createGlobalStyle`
           margin-left: 0%;
           transition: margin-left 300ms linear 0s;
         }
+        &__description {
+          width: 50%;
+          text-align: left;
+          overflow: auto;
+          margin-bottom: 0;
+          color: rgb(255, 255, 255);
+          opacity: 0;
+          visibility: hidden;
+          max-height: 0;
+          transition: 0.3s linear 0s, transform 0.3s linear 0s;
+          font-size: 0.875rem;
+          font-weight: 400;
+        }
         &__wrapper {
           width: 100%;
           height: 100%;
@@ -205,8 +222,8 @@ const GlobalStyle = createGlobalStyle`
         &__heading {
           text-align: center;
           max-width: 80%;
-          margin-top: 1.5rem;
-          margin-bottom: 2rem;
+          margin-top: 0rem;
+          margin-bottom: 2.35rem;
           color: rgb(255, 255, 255);
           font-size: 1.375rem;
           font-weight: 500;
@@ -287,7 +304,7 @@ const GlobalStyle = createGlobalStyle`
             font-weight: 400;
             line-height: 1.5;
             position: absolute;
-            bottom: -1.5rem;
+            top: 4.1rem;
           }
         }
       }
@@ -312,12 +329,27 @@ const GlobalStyle = createGlobalStyle`
             z-index: 99999;
             cursor: default;
             &__slide {
+              &__description {
+                margin-bottom: 2rem;
+                opacity: 1;
+                max-height: 100%;
+                visibility: visible;
+                transition: max-height 0.3s linear 0s, transform 0.3s linear 0s;
+              }
               &__form-field {
                 &__error {
                   visibility: visible;
                 }
                 &__input {
                   pointer-events: all;
+                  &-svg-wrapper {
+                    &-focus {
+                      opacity: 1;
+                      transform: translateY(0);
+                      // transition: 0.2s ease;
+                      transition: opacity 0.2s linear 0s, transform 0.2s linear 0s;
+                    }
+                  }
                 }
               }
             }

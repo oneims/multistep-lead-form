@@ -1,7 +1,26 @@
 import React from "react";
+import styled from "styled-components";
+import InputSVG from "./InputSVG";
+
+const Button = styled.button`
+  padding: 1rem 1.5rem;
+  border: 1px solid rgb(255, 255, 255);
+  border-radius: 3px;
+  background-color: transparent;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  color: rgb(255, 255, 255);
+  pointer-events: all;
+  font-size: 1rem;
+  font-weight: 500;
+`;
 
 const FormSlide = ({
   heading,
+  description,
+  buttonTitle,
+  buttonDestination,
   formFields,
   active,
   currentlyActive,
@@ -9,7 +28,9 @@ const FormSlide = ({
   type,
   register,
   errors,
-  HandleSlideValidated,
+  currentlyFocused,
+  handleSlideValidated,
+  handleCurrentlyFocused,
 }) => {
   return (
     <>
@@ -26,6 +47,18 @@ const FormSlide = ({
             {heading && (
               <div className="MODULE__MultiStepFormCTA__card__slide__heading">
                 <span>{heading}</span>
+              </div>
+            )}
+            {description && (
+              <div className="MODULE__MultiStepFormCTA__card__slide__description">
+                <p>{description}</p>
+              </div>
+            )}
+            {buttonTitle && buttonDestination && (
+              <div className="MODULE__MultiStepFormCTA__card__slide__button-wrapper">
+                <a href={buttonDestination} target="_blank">
+                  <Button tabIndex="-1">{buttonTitle}</Button>
+                </a>
               </div>
             )}
           </div>
@@ -52,6 +85,7 @@ const FormSlide = ({
                     </label>
                     <div className="MODULE__MultiStepFormCTA__card__slide__form-field__input-wrapper">
                       <input
+                        onFocus={(e) => handleCurrentlyFocused(e)}
                         tabIndex={elem.tabIndex}
                         type="text"
                         id={elem.name}
@@ -59,13 +93,23 @@ const FormSlide = ({
                         placeholder={elem.placeholder}
                         className="MODULE__MultiStepFormCTA__card__slide__form-field__input"
                         {...register(elem.name, {
-                          onChange: () => HandleSlideValidated(),
+                          onBlur: () => handleCurrentlyFocused(),
+                          onChange: () => handleSlideValidated(),
                           required: elem.required ? elem.required.message : elem.required,
+                          pattern: elem.pattern ? elem.pattern : null,
                         })}
                       />
-                      <div className="MODULE__MultiStepFormCTA__card__slide__form-field__input-svg-wrapper">
+                      <div
+                        className={`MODULE__MultiStepFormCTA__card__slide__form-field__input-svg-wrapper ${
+                          currentlyFocused === elem.name
+                            ? `MODULE__MultiStepFormCTA__card__slide__form-field__input-svg-wrapper-focus`
+                            : ``
+                        }`}
+                      >
                         <div className="MODULE__MultiStepFormCTA__card__slide__form-field__input-svg">
-                          <span>{/* SVG HERE */}</span>
+                          <span>
+                            <InputSVG />
+                          </span>
                         </div>
                       </div>
                     </div>
