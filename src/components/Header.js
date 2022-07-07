@@ -1,11 +1,16 @@
 import React from "react";
 
-const Header = ({ label, heading, description }) => {
+const Header = ({ label, heading, description, pillBackgroundColor }) => {
   return (
     <>
       {label && (
         <div className="MODULE__pill-wrapper text-center">
-          <span className="MODULE__pill">{label}</span>
+          <span
+            className="MODULE__pill"
+            style={{ backgroundColor: `${pillBackgroundColor ? pillBackgroundColor : ``}` }}
+          >
+            {label}
+          </span>
         </div>
       )}
       <div className="MODULE__heading-and-subtitle text-center">

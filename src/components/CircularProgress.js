@@ -23,6 +23,7 @@ const Icon = styled.svg`
   height: 100%;
   transform: rotate(-90deg);
   will-change: transform;
+  width: 89.4px;
 `;
 
 const Circle = styled.circle`

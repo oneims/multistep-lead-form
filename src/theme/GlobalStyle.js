@@ -1,9 +1,20 @@
 import { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
+.text-center {
+  text-align: center;
+}
 .MODULE {
+  &__inline-callout-cta {
+    font-size: 16px;
+    padding-top: 24px;
+    padding-bottom: 24px;
+    .MODULE__heading-and-subtitle {
+      margin-bottom: 26px;
+    }
+  }
   &__pill {
-    padding: 0.2rem 0.5rem;
+    padding: 3.2px 8px;
     color: #fff;
     background-color: #00bda5;
     border-radius: 10px 3px 3px 10px;
@@ -13,20 +24,15 @@ const GlobalStyle = createGlobalStyle`
     text-transform: uppercase;
     text-decoration: none;
     &-wrapper {
-      margin-bottom: 1rem;
-    }
-  }
-  &__inline-callout-cta {
-    .MODULE__heading-and-subtitle {
-      margin-bottom: 1.75rem;
+      margin-bottom: 16px;
     }
   }
   &__MultiStepFormCTA {
     position: relative;
-    height: 15rem;
     width: 100%;
-    max-width: 38rem;
+    max-width: 608px;
     margin: 0px auto;
+    height: 240px;
     &__open {
       position: absolute;
       top: 0;
@@ -43,9 +49,9 @@ const GlobalStyle = createGlobalStyle`
       position: absolute;
       top: 0px;
       right: 0px;
-      height: 3.2rem;
-      width: 3.2rem;
-      padding: 1rem;
+      height: 51.2px;
+      width: 51.2px;
+      padding: 16px;
       background: none;
       border: none;
       cursor: pointer;
@@ -74,11 +80,13 @@ const GlobalStyle = createGlobalStyle`
     &__image-cutout {
       position: absolute;
       top: 8%;
-      height: 90%;
+      height: 90% !important;
       opacity: 1;
       z-index: 0;
       transition: transform 0.2s ease 0s, opacity 0.2s ease;
       margin: 0px !important;
+      box-shadow: none !important;
+      border-radius: none !important;
       &-left {
         left: 0px;
         transform: translateX(-90%);
@@ -102,8 +110,8 @@ const GlobalStyle = createGlobalStyle`
       overflow: hidden;
       &__icon-wrapper {
         position: relative;
-        width: 2.5rem;
-        height: 2.5rem;
+        width: 40px;
+        height: 40px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -113,7 +121,7 @@ const GlobalStyle = createGlobalStyle`
         background-color: rgb(255, 255, 255);
         border-radius: 3px;
         overflow: hidden;
-        margin-right: 2rem;
+        margin-right: 32px;
         &:hover {
           background-color: #eee;
         }
@@ -128,7 +136,7 @@ const GlobalStyle = createGlobalStyle`
         }
         &-next {
           margin-right: 0;
-          margin-left: 2rem;
+          margin-left: 32px;
         }
         &-submit {
           position: absolute;
@@ -197,17 +205,22 @@ const GlobalStyle = createGlobalStyle`
           transition: margin-left 300ms linear 0s;
         }
         &__description {
-          width: 50%;
-          text-align: left;
+          width: 100%;
+          padding: 0 2em;
+          text-align: center;
           overflow: auto;
           margin-bottom: 0;
           color: rgb(255, 255, 255);
           opacity: 0;
+          display: none;
           visibility: hidden;
-          max-height: 0;
-          transition: 0.3s linear 0s, transform 0.3s linear 0s;
-          font-size: 0.875rem;
+          transition: 0.2s ease;
+          font-size: 14px;
           font-weight: 400;
+          @media (min-width: 576px) {
+            width: 50%;
+            text-align: left;
+          }
         }
         &__wrapper {
           width: 100%;
@@ -222,10 +235,10 @@ const GlobalStyle = createGlobalStyle`
         &__heading {
           text-align: center;
           max-width: 80%;
-          margin-top: 0rem;
-          margin-bottom: 2.35rem;
+          margin-top: 0;
+          margin-bottom: 37.6px;
           color: rgb(255, 255, 255);
-          font-size: 1.375rem;
+          font-size: 22px;
           font-weight: 500;
         }
         &__form-fields {
@@ -233,11 +246,12 @@ const GlobalStyle = createGlobalStyle`
             width: 100%;
             max-width: 800px;
             display: flex;
-            flex-direction: row;
-            -webkit-box-pack: center;
-            justify-content: center;
-            -webkit-box-align: center;
+            flex-direction: column;
             align-items: center;
+            @media (min-width: 576px) {
+              flex-direction: row;
+              justify-content: center;
+            }
           }
         }
         &__form-field {
@@ -247,13 +261,24 @@ const GlobalStyle = createGlobalStyle`
           max-width: 220px;
           position: relative;
           &:first-child {
-            margin-right: 1rem;
+            margin-bottom: 32px;
+            @media (min-width: 576px) {
+              margin-right: 16px;
+              margin-bottom: 0;
+            }
+          }
+          &:last-child {
+            margin-bottom: 0;
+            @media (min-width: 576px) {
+              margin-right: 0;
+              margin-bottom: 0;
+            }
           }
           &__label {
-            padding-bottom: 0.25rem;
+            padding-bottom: 4px;
             text-align: center;
             color: rgb(255, 255, 255);
-            font-size: 0.875rem;
+            font-size: 14px;
             font-weight: 600;
           }
           &__input-wrapper {
@@ -264,23 +289,23 @@ const GlobalStyle = createGlobalStyle`
           &__input {
             width: 100%;
             height: 100%;
-            padding: 0.5rem 2rem;
+            padding: 8px 32px;
             border: none;
             border-radius: 3px;
             color: rgb(51, 71, 91);
             pointer-events: none;
             text-align: center;
             overflow: hidden;
-            font-size: 1rem;
+            font-size: 16px;
             &:focus {
               outline: none;
             }
             &-svg-wrapper {
               position: absolute;
-              right: 0.5rem;
-              bottom: 0.75rem;
-              height: 1rem;
-              width: 1rem;
+              right: 8px;
+              bottom: 12px;
+              height: 16px;
+              width: 16px;
               opacity: 0;
               transform: translateY(50%);
               transition: opacity 0.3s linear 0s, transform 0.3s linear 0s;
@@ -290,7 +315,7 @@ const GlobalStyle = createGlobalStyle`
               width: 100%;
               height: 100%;
               animation: 0.3s cubic-bezier(0.43, 1.44, 0.555, 1.175) 0s 1 normal none running gTcftA;
-              line-height: 1rem;
+              line-height: 16px;
               svg {
                 width: 100%;
                 height: 100%;
@@ -299,12 +324,12 @@ const GlobalStyle = createGlobalStyle`
           }
           &__error {
             visibility: hidden;
-            padding-top: 0.375rem;
-            font-size: 0.75rem;
+            padding-top: 6px;
+            font-size: 12px;
             font-weight: 400;
             line-height: 1.5;
             position: absolute;
-            top: 4.1rem;
+            top: 65.6px;
           }
         }
       }
@@ -323,18 +348,18 @@ const GlobalStyle = createGlobalStyle`
           }
           &__card {
             &__wrapper {
-              padding: 3rem 0;
+              padding: 48px 0;
             }
             position: fixed;
             z-index: 99999;
             cursor: default;
             &__slide {
               &__description {
-                margin-bottom: 2rem;
+                display: block;
+                margin-bottom: 32px;
                 opacity: 1;
-                max-height: 100%;
                 visibility: visible;
-                transition: max-height 0.3s linear 0s, transform 0.3s linear 0s;
+                transition: 0.2s ease;
               }
               &__form-field {
                 &__error {

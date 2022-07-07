@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 // Animations
 import { PlayState, Tween } from "react-gsap";
+// import FocusTrap from "focus-trap-react";
+import ScrollLock, { TouchScrollable } from "react-scrolllock";
 // Form
 import { useForm } from "react-hook-form";
 // Components
@@ -8,17 +10,33 @@ import Header from "./components/Header";
 import FormSlide from "./components/FormSlide";
 import Navigation from "./components/Navigation";
 // Helpers
-import { CapitalizeFirstLetter } from "./lib/Helpers";
+import { capitalizeFirstLetter, postPayload } from "./lib/Helpers";
+// Custom Hooks
+import { useWindowSize, useAPIRequest } from "./lib/Hooks";
 
-const App = () => {
+const App = ({ domElement }) => {
+  let clientIp;
+  const abstractApiKey = `217115b2cb044e7499288dde73d4ab7a`;
+  const formId = domElement.getAttribute("data-formId");
+  const portalId = domElement.getAttribute("data-portalId");
+  const pillBackgroundColor = domElement.getAttribute("data-pillBackgroundColor");
+  const cardBackgroundGradientLeft = domElement.getAttribute("data-cardBackgroundGradientLeft");
+  const cardBackgroundGradientRight = domElement.getAttribute("data-cardBackgroundGradientRight");
+  const widgetLabel = domElement.getAttribute("data-widgetLabel");
+  const widgetHeading = domElement.getAttribute("data-widgetHeading");
+  const widgetDescription = domElement.getAttribute("data-widgetDescription");
+  const widgetResource = domElement.getAttribute("data-widgetResource");
+
   // Ref
   const cardRef = useRef();
   // Hooks
+  const { width } = useWindowSize();
+  const [bannerHeight, setBannerHeight] = useState(20);
   const {
     register,
     handleSubmit,
     watch,
-    formState: { errors, name },
+    formState: { errors },
   } = useForm({
     mode: "all",
   });
@@ -145,10 +163,10 @@ const App = () => {
     {
       id: 4,
       type: "message",
-      heading: ``,
-      description: `We use the information you provide to us to contact you about our relevant content, products, and services . You can unsubscribe from communications from us at any time.`,
-      buttonTitle: `Download Now`,
-      buttonDestination: `#`,
+      heading: `🎉 Access your featured resource! 🥳`,
+      description: ``,
+      buttonTitle: `Access Now`,
+      buttonDestination: `${widgetResource ? widgetResource : `#`}`,
     },
   ]);
   const [currentlyFocused, setCurrentlyFocused] = useState(null);
@@ -158,10 +176,17 @@ const App = () => {
     canPrev: false,
   });
   const [progress, setProgress] = useState(0);
+  const [initialWindowWidth] = useState(window.innerWidth);
+  const { data: abstractData } = useAPIRequest(
+    `https://ipgeolocation.abstractapi.com/v1/?api_key=${abstractApiKey}`
+  );
+  const [lockScroll, setLockScroll] = useState(false);
+
+  if (abstractData) {
+    clientIp = abstractData.ip_address;
+  }
 
   // Handlers
-  const onSubmit = (data) => console.log(`form submitted: `, data);
-
   const handleNext = () => {
     setCurrentlyActive(
       currentlyActive === slides.length - 1 ? slides.length - 1 : currentlyActive + 1
@@ -176,7 +201,7 @@ const App = () => {
     setProgress((currentlyActive / (slides.length - 1)) * 100);
   };
 
-  const scrollHandler = () => {
+  const handleBoundingClientRect = () => {
     setBoundingClientRect((prevState) => ({
       ...prevState,
       left: cardRef.current.getBoundingClientRect().left,
@@ -186,17 +211,21 @@ const App = () => {
     }));
   };
 
+  const handleScroll = () => {
+    handleBoundingClientRect();
+  };
+
   const handleExpanded = () => {
     if (expanded) {
       setExpanded(false);
       setPlayState(PlayState.reverse);
       setTimeout(() => {
-        document.body.style.overflow = "";
+        setLockScroll(false);
       }, 1000);
     } else {
       setExpanded(true);
       setPlayState(PlayState.play);
-      document.body.style.overflow = "hidden";
+      setLockScroll(true);
     }
   };
 
@@ -229,19 +258,6 @@ const App = () => {
     }
   };
 
-  const disableTabIndex = () => {
-    let tempArr = [...slides];
-    tempArr.forEach((elem) => {
-      const formFields = elem?.formFields;
-      if (formFields) {
-        formFields.forEach((elem2) => {
-          elem2.tabIndex = "-1";
-        });
-      }
-    });
-    setSlides(tempArr);
-  };
-
   const handleTabIndex = () => {
     disableTabIndex();
     let tempArr = [...slides];
@@ -257,27 +273,88 @@ const App = () => {
   const handleFirstName = () => {
     let tempArr = [...slides];
     tempArr[1]["heading"] = `Hi ${
-      firstName && CapitalizeFirstLetter(firstName)
+      firstName && capitalizeFirstLetter(firstName)
     }, what's your email address?`;
     setSlides(tempArr);
   };
 
+  const handleBannerHeight = () => {
+    if (width > 576) {
+      setBannerHeight(15);
+    } else {
+      setBannerHeight(22);
+    }
+  };
+
+  const disableTabIndex = () => {
+    let tempArr = [...slides];
+    tempArr.forEach((elem) => {
+      const formFields = elem?.formFields;
+      if (formFields) {
+        formFields.forEach((elem2) => {
+          elem2.tabIndex = "-1";
+        });
+      }
+    });
+    setSlides(tempArr);
+  };
+
+  const onSubmit = (data) => {
+    const url = `https://api.hsforms.com/submissions/v3/integration/submit/${portalId}/${formId}`;
+    const payload = {
+      submittedAt: +new Date(),
+      fields: [
+        {
+          name: "firstname",
+          value: data.fName,
+        },
+        {
+          name: "lastname",
+          value: data.lName,
+        },
+        {
+          name: "email",
+          value: data.email,
+        },
+        {
+          name: "phone",
+          value: data.phone,
+        },
+        {
+          name: "company",
+          value: data.company,
+        },
+        {
+          name: "website",
+          value: data.website,
+        },
+      ],
+      context: {
+        hutk: document.cookie.replace(/(?:(?:^|.*;\s*)hubspotutk\s*\=\s*([^;]*).*$)|^.*$/, "$1"),
+        pageUri: window.location.href,
+        pageName: document.title,
+        ipAddress: clientIp,
+      },
+    };
+    postPayload(url, payload);
+  };
+
   useEffect(() => {
-    setBoundingClientRect((prevState) => ({
-      ...prevState,
-      left: cardRef.current.getBoundingClientRect().left,
-      top: cardRef.current.getBoundingClientRect().top,
-      width: cardRef.current.getBoundingClientRect().width,
-      height: cardRef.current.getBoundingClientRect().height,
-    }));
+    handleBoundingClientRect();
+    handleBannerHeight();
   }, []);
 
   useEffect(() => {
-    window.addEventListener("scroll", scrollHandler, true);
+    window.addEventListener("scroll", handleScroll, true);
     return () => {
-      window.removeEventListener("scroll", scrollHandler, true);
+      window.removeEventListener("scroll", handleScroll, true);
     };
   }, [boundingClientRect]);
+
+  useEffect(() => {
+    handleBoundingClientRect();
+    handleBannerHeight();
+  }, [width]);
 
   useEffect(() => {
     setPagination((prevState) => ({
@@ -292,150 +369,154 @@ const App = () => {
 
   return (
     <>
-      <section style={{ minHeight: "500vh" }} id="BLOCK__kkd00s" className="pt-5 pb-5">
-        <div className="container">
-          <div className="THEME__mw-800 mx-auto">
-            <div className="MODULE__article-content">
-              <div className="MODULE__inline-callout-cta pt-4 pb-4">
-                <div className="MODULE__inline-callout-cta__body">
-                  <Header />
-                  <div
-                    className={`MODULE__MultiStepFormCTA ${
-                      expanded ? `MODULE__MultiStepFormCTA-active` : ``
-                    }`}
-                  >
-                    <div
+      <ScrollLock isActive={lockScroll} />
+      <div className="MODULE__article-content">
+        <div className="MODULE__inline-callout-cta">
+          <div className="MODULE__inline-callout-cta__body">
+            <Header
+              label={widgetLabel}
+              heading={widgetHeading}
+              description={widgetDescription}
+              pillBackgroundColor={pillBackgroundColor}
+            />
+            <div
+              style={{
+                height: `${bannerHeight}em`,
+              }}
+              className={`MODULE__MultiStepFormCTA ${
+                expanded ? `MODULE__MultiStepFormCTA-active` : ``
+              }`}
+            >
+              <div
+                onClick={() => handleExpanded()}
+                className="MODULE__MultiStepFormCTA__screen-tint"
+              ></div>
+              <div
+                onClick={() => handleExpanded()}
+                className="MODULE__MultiStepFormCTA__open"
+              ></div>
+              {width > 900 && (
+                <img
+                  src="https://testwpressdev.wpengine.com/static/offer-left.svg"
+                  alt=""
+                  className="MODULE__MultiStepFormCTA__image-cutout MODULE__MultiStepFormCTA__image-cutout-left"
+                />
+              )}
+              <Tween
+                playState={playState}
+                from={{
+                  // width: width < 768 ? `100%` : boundingClientRect.width + "px",
+                  // height: width < 768 ? `100%` : boundingClientRect.height + "px",
+                  position: "sticky",
+                }}
+                to={{
+                  position: "fixed",
+                  width: initialWindowWidth > 992 ? `85vw` : `100vw`,
+                  height: initialWindowWidth > 992 ? `85vh` : `100vh`,
+                  top: initialWindowWidth > 992 ? "7.5vh" : `0`,
+                  left: initialWindowWidth > 992 ? "7.5vw" : `0`,
+                }}
+                duration={0.75}
+                ease="elastic.out(0.1, 0.1)"
+              >
+                <div
+                  style={{
+                    top: boundingClientRect.top + "px",
+                    left: boundingClientRect.left + "px",
+                    width: `100%`,
+                    height: `100%`,
+                    background: `linear-gradient(45deg, ${cardBackgroundGradientLeft}, ${cardBackgroundGradientRight})`,
+                  }}
+                  ref={cardRef}
+                  className={`MODULE__MultiStepFormCTA__card`}
+                >
+                  <div className="MODULE__MultiStepFormCTA__card__wrapper">
+                    <button
                       onClick={() => handleExpanded()}
-                      className="MODULE__MultiStepFormCTA__screen-tint"
-                    ></div>
-                    <div
-                      onClick={() => handleExpanded()}
-                      className="MODULE__MultiStepFormCTA__open"
-                    ></div>
-                    <img
-                      src="//cdn2.hubspot.net/hubfs/53/tools/Multi%20Step%20Form/offer-left.svg"
-                      alt=""
-                      className="MODULE__MultiStepFormCTA__image-cutout MODULE__MultiStepFormCTA__image-cutout-left"
-                    />
-                    <Tween
-                      playState={playState}
-                      from={{
-                        // width: boundingClientRect.width + "px",
-                        // height: boundingClientRect.height + "px",
-                        position: "sticky",
-                      }}
-                      to={{
-                        position: "fixed",
-                        width: "85vw",
-                        height: "85vh",
-                        top: "7.5vh",
-                        left: "7.5vw",
-                      }}
-                      // stagger={0.1}
-                      duration={0.75}
-                      ease="elastic.out(0.1, 0.1)"
+                      aria-label="Close form"
+                      className="MODULE__MultiStepFormCTA__close"
                     >
-                      <div
-                        style={{
-                          top: boundingClientRect.top + "px",
-                          left: boundingClientRect.left + "px",
-                          width: `${!expanded && "100%"}`,
-                          height: `${!expanded && "100%"}`,
-                        }}
-                        ref={cardRef}
-                        className={`MODULE__MultiStepFormCTA__card`}
-                      >
-                        <div className="MODULE__MultiStepFormCTA__card__wrapper">
-                          <button
-                            onClick={() => handleExpanded()}
-                            aria-label="Close form"
-                            className="MODULE__MultiStepFormCTA__close"
+                      <div className="MODULE__MultiStepFormCTA__close-outer">
+                        <span className="isvg loaded">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 14 14"
                           >
-                            <div className="MODULE__MultiStepFormCTA__close-outer">
-                              <span className="isvg loaded">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="14"
-                                  height="14"
-                                  viewBox="0 0 14 14"
-                                >
-                                  <g
-                                    fill="none"
-                                    fillRule="evenodd"
-                                    stroke="none"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="1"
-                                    transform="translate(-1297 -342)"
-                                  >
-                                    <g
-                                      stroke="#FFF"
-                                      strokeWidth="2"
-                                      transform="translate(1298 343)"
-                                    >
-                                      <g>
-                                        <path d="M0 11.314L11.314 0"></path>
-                                        <path
-                                          d="M0 11.314L11.314 0"
-                                          transform="matrix(-1 0 0 1 11.314 0)"
-                                        ></path>
-                                      </g>
-                                    </g>
-                                  </g>
-                                </svg>
-                              </span>
-                            </div>
-                          </button>
-                          <form autoComplete="off" className="MODULE__MultiStepFormCTA__card__form">
-                            {slides.map((elem, index) => {
-                              return (
-                                <FormSlide
-                                  key={elem.id}
-                                  index={index}
-                                  type={elem.type}
-                                  currentlyActive={currentlyActive}
-                                  active={currentlyActive === elem.id}
-                                  heading={elem.heading}
-                                  description={elem.description}
-                                  buttonTitle={elem.buttonTitle}
-                                  buttonDestination={elem.buttonDestination}
-                                  formFields={elem.formFields}
-                                  register={register}
-                                  errors={errors}
-                                  currentlyFocused={currentlyFocused}
-                                  handleCurrentlyFocused={handleCurrentlyFocused}
-                                  handleSlideValidated={handleSlideValidated}
-                                />
-                              );
-                            })}
-                          </form>
-                          <Navigation
-                            handleNext={handleNext}
-                            handlePrev={handlePrev}
-                            canNext={pagination.canNext}
-                            canPrev={pagination.canPrev}
-                            progress={progress}
-                            currentlyActive={currentlyActive}
-                            slidesLength={slides.length}
-                            handleSubmit={handleSubmit}
-                            onSubmit={onSubmit}
-                          />
-                        </div>
-                        <div className="MODULE__heading"></div>
+                            <g
+                              fill="none"
+                              fillRule="evenodd"
+                              stroke="none"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="1"
+                              transform="translate(-1297 -342)"
+                            >
+                              <g stroke="#FFF" strokeWidth="2" transform="translate(1298 343)">
+                                <g>
+                                  <path d="M0 11.314L11.314 0"></path>
+                                  <path
+                                    d="M0 11.314L11.314 0"
+                                    transform="matrix(-1 0 0 1 11.314 0)"
+                                  ></path>
+                                </g>
+                              </g>
+                            </g>
+                          </svg>
+                        </span>
                       </div>
-                    </Tween>
-                    <img
-                      src="//cdn2.hubspot.net/hubfs/53/tools/Multi%20Step%20Form/offer-right.svg"
-                      alt=""
-                      className="MODULE__MultiStepFormCTA__image-cutout MODULE__MultiStepFormCTA__image-cutout-right"
+                    </button>
+                    <form autoComplete="off" className="MODULE__MultiStepFormCTA__card__form">
+                      {slides.map((elem, index) => {
+                        return (
+                          <FormSlide
+                            key={elem.id}
+                            index={index}
+                            type={elem.type}
+                            currentlyActive={currentlyActive}
+                            active={currentlyActive === elem.id}
+                            heading={elem.heading}
+                            description={elem.description}
+                            buttonTitle={elem.buttonTitle}
+                            buttonDestination={elem.buttonDestination}
+                            formFields={elem.formFields}
+                            register={register}
+                            errors={errors}
+                            currentlyFocused={currentlyFocused}
+                            handleCurrentlyFocused={handleCurrentlyFocused}
+                            handleSlideValidated={handleSlideValidated}
+                          />
+                        );
+                      })}
+                    </form>
+
+                    <Navigation
+                      handleNext={handleNext}
+                      handlePrev={handlePrev}
+                      canNext={pagination.canNext}
+                      canPrev={pagination.canPrev}
+                      progress={progress}
+                      currentlyActive={currentlyActive}
+                      slidesLength={slides.length}
+                      handleSubmit={handleSubmit}
+                      onSubmit={onSubmit}
                     />
                   </div>
+                  <div className="MODULE__heading"></div>
                 </div>
-              </div>
+              </Tween>
+              {width > 900 && (
+                <img
+                  src="https://testwpressdev.wpengine.com/static/offer-right.svg"
+                  alt=""
+                  className="MODULE__MultiStepFormCTA__image-cutout MODULE__MultiStepFormCTA__image-cutout-right"
+                />
+              )}
             </div>
           </div>
         </div>
-      </section>
+      </div>
     </>
   );
 };
