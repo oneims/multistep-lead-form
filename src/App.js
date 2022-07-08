@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 // Animations
 import { PlayState, Tween } from "react-gsap";
 // import FocusTrap from "focus-trap-react";
-import ScrollLock, { TouchScrollable } from "react-scrolllock";
 // Form
 import { useForm } from "react-hook-form";
 // Components
@@ -16,7 +15,7 @@ import { useWindowSize, useAPIRequest } from "./lib/Hooks";
 
 const App = ({ domElement }) => {
   let clientIp;
-  const abstractApiKey = `217115b2cb044e7499288dde73d4ab7a`;
+  const abstractApiKey = process.env.REACT_APP_ABSTRACT_API_KEY;
   const formId = domElement.getAttribute("data-formId");
   const portalId = domElement.getAttribute("data-portalId");
   const pillBackgroundColor = domElement.getAttribute("data-pillBackgroundColor");
@@ -31,7 +30,7 @@ const App = ({ domElement }) => {
   const cardRef = useRef();
   // Hooks
   const { width } = useWindowSize();
-  const [bannerHeight, setBannerHeight] = useState(20);
+  const [bannerHeight, setBannerHeight] = useState(15);
   const {
     register,
     handleSubmit,
@@ -177,10 +176,11 @@ const App = ({ domElement }) => {
   });
   const [progress, setProgress] = useState(0);
   const [initialWindowWidth] = useState(window.innerWidth);
+  const [cardZIndex, setCardZIndex] = useState(null);
+  const [tintZIndex, setTintZIndex] = useState(null);
   const { data: abstractData } = useAPIRequest(
     `https://ipgeolocation.abstractapi.com/v1/?api_key=${abstractApiKey}`
   );
-  const [lockScroll, setLockScroll] = useState(false);
 
   if (abstractData) {
     clientIp = abstractData.ip_address;
@@ -219,13 +219,19 @@ const App = ({ domElement }) => {
     if (expanded) {
       setExpanded(false);
       setPlayState(PlayState.reverse);
+      setCardZIndex(99999);
+      setTintZIndex(9999);
       setTimeout(() => {
-        setLockScroll(false);
+        document.body.style.cssText = "";
+        document.querySelector("html").style.cssText = "";
+        setCardZIndex(null);
+        setTintZIndex(null);
       }, 1000);
     } else {
       setExpanded(true);
       setPlayState(PlayState.play);
-      setLockScroll(true);
+      document.querySelector("html").style.cssText = "overflow: hidden !important;";
+      document.body.style.cssText = "overflow: hidden !important;";
     }
   };
 
@@ -253,6 +259,8 @@ const App = ({ domElement }) => {
   const handleCurrentlyFocused = (e) => {
     if (e) {
       setCurrentlyFocused(e?.target?.id);
+      // window.scrollTo(0, 0);
+      // document.body.scrollTop = 0;
     } else {
       setCurrentlyFocused(null);
     }
@@ -282,7 +290,7 @@ const App = ({ domElement }) => {
     if (width > 576) {
       setBannerHeight(15);
     } else {
-      setBannerHeight(22);
+      setBannerHeight(15);
     }
   };
 
@@ -369,7 +377,6 @@ const App = ({ domElement }) => {
 
   return (
     <>
-      <ScrollLock isActive={lockScroll} />
       <div className="MODULE__article-content">
         <div className="MODULE__inline-callout-cta">
           <div className="MODULE__inline-callout-cta__body">
@@ -389,6 +396,9 @@ const App = ({ domElement }) => {
             >
               <div
                 onClick={() => handleExpanded()}
+                style={{
+                  zIndex: tintZIndex,
+                }}
                 className="MODULE__MultiStepFormCTA__screen-tint"
               ></div>
               <div
@@ -397,7 +407,7 @@ const App = ({ domElement }) => {
               ></div>
               {width > 900 && (
                 <img
-                  src="https://testwpressdev.wpengine.com/static/offer-left.svg"
+                  src="https://www.oneims.com/static/multistep-lead-form/offer-left.svg"
                   alt=""
                   className="MODULE__MultiStepFormCTA__image-cutout MODULE__MultiStepFormCTA__image-cutout-left"
                 />
@@ -411,10 +421,10 @@ const App = ({ domElement }) => {
                 }}
                 to={{
                   position: "fixed",
-                  width: initialWindowWidth > 992 ? `85vw` : `100vw`,
-                  height: initialWindowWidth > 992 ? `85vh` : `100vh`,
-                  top: initialWindowWidth > 992 ? "7.5vh" : `0`,
-                  left: initialWindowWidth > 992 ? "7.5vw" : `0`,
+                  width: `85vw`,
+                  height: `85vh`,
+                  top: `7.5vh`,
+                  left: `7.5vw`,
                 }}
                 duration={0.75}
                 ease="elastic.out(0.1, 0.1)"
@@ -425,6 +435,7 @@ const App = ({ domElement }) => {
                     left: boundingClientRect.left + "px",
                     width: `100%`,
                     height: `100%`,
+                    zIndex: cardZIndex,
                     background: `linear-gradient(45deg, ${cardBackgroundGradientLeft}, ${cardBackgroundGradientRight})`,
                   }}
                   ref={cardRef}
@@ -508,7 +519,7 @@ const App = ({ domElement }) => {
               </Tween>
               {width > 900 && (
                 <img
-                  src="https://testwpressdev.wpengine.com/static/offer-right.svg"
+                  src="https://www.oneims.com/static/multistep-lead-form/offer-right.svg"
                   alt=""
                   className="MODULE__MultiStepFormCTA__image-cutout MODULE__MultiStepFormCTA__image-cutout-right"
                 />

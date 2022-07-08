@@ -231,6 +231,10 @@ const GlobalStyle = createGlobalStyle`
           justify-content: center;
           -webkit-box-align: center;
           align-items: center;
+          @media (max-width: 768px) {
+            justify-content: flex-start;
+            margin-top: 56px;
+          }
         }
         &__heading {
           text-align: center;
@@ -246,11 +250,13 @@ const GlobalStyle = createGlobalStyle`
             width: 100%;
             max-width: 800px;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
-            @media (min-width: 576px) {
-              flex-direction: row;
-              justify-content: center;
+            justify-content: center;
+            @media (max-width: 576px) {
+              max-width: 100%;
+              padding-left: 1rem;
+              padding-right: 1rem;
             }
           }
         }
@@ -260,11 +266,16 @@ const GlobalStyle = createGlobalStyle`
           width: 100%;
           max-width: 220px;
           position: relative;
+          // @media (max-width: 576px) {
+          //   max-width: 100%;
+          //   padding-left: 1rem;
+          //   padding-right: 1rem;
+          // }
           &:first-child {
-            margin-bottom: 32px;
+            // margin-bottom: 32px;
+            margin-right: 16px;
             @media (min-width: 576px) {
               margin-right: 16px;
-              margin-bottom: 0;
             }
           }
           &:last-child {

@@ -57,7 +57,9 @@ const FormSlide = ({
             {buttonTitle && buttonDestination && (
               <div className="MODULE__MultiStepFormCTA__card__slide__button-wrapper">
                 <a tabIndex="-1" href={buttonDestination} target="_blank" rel="noreferrer">
-                  <Button tabIndex="-1">{buttonTitle}</Button>
+                  <Button type="button" tabIndex="-1">
+                    {buttonTitle}
+                  </Button>
                 </a>
               </div>
             )}
