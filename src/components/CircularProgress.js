@@ -14,7 +14,7 @@ const Wrapper = styled.div`
     top: 50%;
     transform: translate(-50%, -50%);
     color: rgb(255, 255, 255);
-    font-size: 1rem;
+    font-size: 16px;
     font-weight: 500;
   }
 `;

@@ -280,8 +280,8 @@ const GlobalStyle = createGlobalStyle`
           }
           &:last-child {
             margin-bottom: 0;
+            margin-right: 0;
             @media (min-width: 576px) {
-              margin-right: 0;
               margin-bottom: 0;
             }
           }
@@ -393,7 +393,7 @@ const GlobalStyle = createGlobalStyle`
           &__image-cutout {
             opacity: 0;
             transform: translateX(-50%);
-            transition: transform 0.2s ease 0s, opacity 0.2s ease;
+            transition: transform 0.3s ease 0s, opacity 0.2s ease;
           }
           &__close {
             background: none;

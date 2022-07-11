@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 // Animations
 import { PlayState, Tween } from "react-gsap";
-// import FocusTrap from "focus-trap-react";
 // Form
 import { useForm } from "react-hook-form";
 // Components
@@ -25,6 +24,14 @@ const App = ({ domElement }) => {
   const widgetHeading = domElement.getAttribute("data-widgetHeading");
   const widgetDescription = domElement.getAttribute("data-widgetDescription");
   const widgetResource = domElement.getAttribute("data-widgetResource");
+  const cardEasing = `elastic.out(0.1, 0.1)`;
+  const expandedCardCoordinates = {
+    position: "fixed",
+    width: `85vw`,
+    height: `85vh`,
+    top: `7.5vh`,
+    left: `7.5vw`,
+  };
 
   // Ref
   const cardRef = useRef();
@@ -175,7 +182,7 @@ const App = ({ domElement }) => {
     canPrev: false,
   });
   const [progress, setProgress] = useState(0);
-  const [initialWindowWidth] = useState(window.innerWidth);
+  const [cardAnimationDuration, setCardAnimationDuration] = useState(0.75);
   const [cardZIndex, setCardZIndex] = useState(null);
   const [tintZIndex, setTintZIndex] = useState(null);
   const { data: abstractData } = useAPIRequest(
@@ -215,7 +222,16 @@ const App = ({ domElement }) => {
     handleBoundingClientRect();
   };
 
+  const handleAnimation = () => {
+    if (expanded) {
+      setCardAnimationDuration(0.6);
+    } else {
+      setCardAnimationDuration(0.75);
+    }
+  };
+
   const handleExpanded = () => {
+    handleAnimation();
     if (expanded) {
       setExpanded(false);
       setPlayState(PlayState.reverse);
@@ -226,8 +242,9 @@ const App = ({ domElement }) => {
         document.querySelector("html").style.cssText = "";
         setCardZIndex(null);
         setTintZIndex(null);
-      }, 1000);
+      }, 780);
     } else {
+      // window.scrollTo({ top: boundingClientRect.top - 300 });
       setExpanded(true);
       setPlayState(PlayState.play);
       document.querySelector("html").style.cssText = "overflow: hidden !important;";
@@ -415,24 +432,18 @@ const App = ({ domElement }) => {
               <Tween
                 playState={playState}
                 from={{
-                  // width: width < 768 ? `100%` : boundingClientRect.width + "px",
-                  // height: width < 768 ? `100%` : boundingClientRect.height + "px",
+                  // top: `${boundingClientRect.top}px`,
+                  // left: `${boundingClientRect.left}px`,
                   position: "sticky",
                 }}
-                to={{
-                  position: "fixed",
-                  width: `85vw`,
-                  height: `85vh`,
-                  top: `7.5vh`,
-                  left: `7.5vw`,
-                }}
-                duration={0.75}
-                ease="elastic.out(0.1, 0.1)"
+                to={expandedCardCoordinates}
+                duration={cardAnimationDuration}
+                ease={cardEasing}
               >
                 <div
                   style={{
-                    top: boundingClientRect.top + "px",
-                    left: boundingClientRect.left + "px",
+                    top: `${boundingClientRect.top}px`,
+                    left: `${boundingClientRect.left}px`,
                     width: `100%`,
                     height: `100%`,
                     zIndex: cardZIndex,
